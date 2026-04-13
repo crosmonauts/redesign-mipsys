@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import api from "@/lib/axios"
+// Import api di-comment dulu kalau belum mau dipakai
+// import api from "@/lib/axios" 
 import { 
   Card, 
   CardContent, 
@@ -12,47 +13,37 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck, LogIn, Loader2, AlertCircle, User } from "lucide-react" // Tambah ikon User
+import { ShieldCheck, Loader2, AlertCircle, User } from "lucide-react"
 
 export default function Login() {
-  // 1. Ganti state email menjadi username
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   
   const navigate = useNavigate()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
-    try {
-      // 2. Sesuaikan request body dengan key "username"
-      const response = await api.post("/auth/login", {
-        username: username, // Mengirim username ke backend
-        password: password
-      })
-
-      // Simpan token (pastikan path response.data.token sesuai dengan backend temanmu)
-      const token = response.data.token 
-      
-      if (token) {
-        localStorage.setItem("token", token)
+    // SIMULASI LOGIN (MOCKING)
+    setTimeout(() => {
+      // Mas Nanda bisa set aturan login manual di sini
+      // Contoh: Login hanya bisa kalau username adalah "admin"
+      if (username === "nanda" && password === "admin123") {
+        // 1. Set token palsu agar ProtectedRoute di App.tsx mengizinkan lewat
+        localStorage.setItem("token", "dummy-token-trecs-2026")
+        
+        setIsLoading(false)
+        // 2. Langsung masuk ke Dashboard
         navigate("/")
       } else {
-        setError("Token tidak ditemukan dalam respons server.")
+        setIsLoading(false)
+        setError("Username atau password salah! (Hint: nanda / admin123)")
       }
-
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Username atau password salah!"
-      setError(message)
-      console.error("Login Error:", err)
-    } finally {
-      setIsLoading(false)
-    }
+    }, 1000) // Efek loading 1 detik biar kelihatan keren
   }
 
   return (
@@ -71,30 +62,29 @@ export default function Login() {
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">T-RECS LOGIN</CardTitle>
           <CardDescription>
-            Masukkan username dan password MIP Anda.
+            Mode Pengembangan: Masukkan username & password manual.
           </CardDescription>
         </CardHeader>
 
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
                 <AlertCircle size={16} />
                 <span>{error}</span>
               </div>
             )}
 
             <div className="space-y-2">
-              {/* 3. Ganti Label & Input menjadi Username */}
               <Label htmlFor="username">Username</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input 
                   id="username" 
-                  type="text" // Type text karena bukan email
-                  placeholder="Masukkan username Anda..." 
+                  type="text" 
+                  placeholder="nanda" 
                   required 
-                  className="pl-10 bg-slate-50/50 focus:bg-white transition-all"
+                  className="pl-10 bg-slate-50/50"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
@@ -103,15 +93,13 @@ export default function Login() {
             </div>
             
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
-                placeholder="••••••••"
+                placeholder="admin123"
                 required 
-                className="bg-slate-50/50 focus:bg-white transition-all"
+                className="bg-slate-50/50"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -122,8 +110,8 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 h-11 text-base font-semibold transition-all active:scale-95"
-              disabled={isLoading || !username || !password}
+              className="w-full bg-blue-600 hover:bg-blue-700 h-11 text-base font-semibold"
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
@@ -131,13 +119,11 @@ export default function Login() {
                   Memverifikasi...
                 </>
               ) : (
-                <>
-                  Masuk Sekarang <LogIn className="ml-2 h-4 w-4" />
-                </>
+                "Masuk Sekarang"
               )}
             </Button>
-            <p className="text-center text-[10px] text-slate-400 uppercase tracking-[0.2em] font-bold">
-              PT Mitrainfoparama • 2026
+            <p className="text-center text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+              PT Mitrainfoparama • Offline Mode
             </p>
           </CardFooter>
         </form>
